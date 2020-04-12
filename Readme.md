@@ -13,7 +13,7 @@ Return array query result list
 ###### Sample usage
 
 Build  
-`go build`
+`go build -ldflags "-s -w"`
 
 Run  
 `./sqlite_rest -c :memory:`

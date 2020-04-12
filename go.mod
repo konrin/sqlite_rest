@@ -1,4 +1,4 @@
-module github.com/konrin/sqltite_rest
+module github.com/konrin/sqlite_rest
 
 go 1.14
 
