@@ -86,19 +86,17 @@ func (db *DB) Query(sql string, args ...interface{}) (Rows, error) {
 	for rows.Next() {
 		row := Row{}
 
+		dataCols := make([]interface{}, len(columns))
+
 		for i, col := range columns {
 			row[col] = &ColumnValue{
 				Type: columnTypes[i],
 			}
+
+			dataCols[i] = &row[col].Data
 		}
 
 		rowsData = append(rowsData, &row)
-
-		dataCols := make([]interface{}, len(columns))
-
-		for i, col := range columns {
-			dataCols[i] = &row[col].Data
-		}
 
 		err = rows.Scan(dataCols...)
 		if err != nil {
