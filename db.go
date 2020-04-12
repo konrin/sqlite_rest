@@ -95,11 +95,9 @@ func (db *DB) Query(sql string, args ...interface{}) (Rows, error) {
 		rowsData = append(rowsData, &row)
 
 		dataCols := make([]interface{}, len(columns))
-		var i = 0
 
-		for _, col := range row {
-			dataCols[i] = &col.Data
-			i++
+		for i, col := range columns {
+			dataCols[i] = &row[col].Data
 		}
 
 		err = rows.Scan(dataCols...)

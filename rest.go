@@ -23,7 +23,12 @@ func (r *Rest) ExecHandler() func(http.ResponseWriter, *http.Request) {
 		var data bodyData
 
 		if err := json.NewDecoder(req.Body).Decode(&data); err != nil {
-			r.sendError(w, 500, "QUERY_ERR", err.Error())
+			r.sendError(w, 400, "QUERY_ERR", err.Error())
+			return
+		}
+
+		if len(data.Sql) == 0 {
+			r.sendError(w, 400, "REQUEST_ERR", "SQL empty")
 			return
 		}
 
@@ -42,6 +47,11 @@ func (r *Rest) ExecHandler() func(http.ResponseWriter, *http.Request) {
 
 func (r *Rest) QueryHandler(w http.ResponseWriter, req *http.Request) {
 	sql := req.URL.Query().Get("sql")
+	if len(sql) == 0 {
+		r.sendError(w, 400, "REQUEST_ERR", "SQL empty")
+		return
+	}
+
 	paramsRaw := req.URL.Query().Get("params")
 	params := make([]interface{}, 0)
 
@@ -58,14 +68,14 @@ func (r *Rest) QueryHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	r.sendOK(w, r.service.RowsToMap(rows))
+	r.sendOK(w, r.service.RowsToOrderedMap(rows))
 }
 
 func (r *Rest) sendError(w http.ResponseWriter, httpCode int, code string, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(httpCode)
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	json.NewEncoder(w).Encode(StringMap{
 		"code":    code,
 		"message": message,
 	})

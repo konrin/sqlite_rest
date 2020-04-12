@@ -8,7 +8,7 @@ import (
 
 func main() {
 	if isRequestVersion() {
-		fmt.Printf("v%s", Version)
+		fmt.Printf("v%s\n", Version)
 		return
 	}
 
@@ -18,6 +18,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
 
 	service := NewService(db)
 	rest := NewRest(service)
@@ -25,5 +26,5 @@ func main() {
 	http.HandleFunc("/sql/exec", rest.ExecHandler())
 	http.HandleFunc("/sql/query", rest.QueryHandler)
 
-	http.ListenAndServe(":1212", nil)
+	http.ListenAndServe(fmt.Sprintf("%s:%d", conf.HTTP.Host, conf.HTTP.Port), nil)
 }

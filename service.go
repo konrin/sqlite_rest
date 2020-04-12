@@ -1,8 +1,12 @@
 package main
 
+import "github.com/iancoleman/orderedmap"
+
 type Service struct {
 	db *DB
 }
+
+type StringMap map[string]interface{}
 
 func NewService(db *DB) *Service {
 	return &Service{
@@ -32,14 +36,14 @@ func (s *Service) QueryRaw(sql string, args ...interface{}) (Rows, error) {
 	return rows, nil
 }
 
-func (s *Service) RowsToMap(rows Rows) []map[string]interface{} {
-	data := make([]map[string]interface{}, len(rows))
+func (s *Service) RowsToOrderedMap(rows Rows) []*orderedmap.OrderedMap {
+	data := make([]*orderedmap.OrderedMap, len(rows))
 
 	for i, row := range rows {
-		dataRow := make(map[string]interface{})
+		dataRow := orderedmap.New()
 
 		for key := range *row {
-			dataRow[key] = (*row)[key].Data
+			dataRow.Set(key, (*row)[key].Data)
 		}
 
 		data[i] = dataRow
