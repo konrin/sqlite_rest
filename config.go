@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 )
 
@@ -18,9 +19,15 @@ type Config struct {
 func GetConfig() *Config {
 	conf := &Config{}
 
-	flag.StringVar(&conf.DB.Connection, "c", ":memory:", "Connection string. Default :memory:. Example: file:test.s3db?_auth&_auth_user=admin&_auth_pass=admin")
-	flag.StringVar(&conf.HTTP.Host, "h", "", "Host")
-	flag.UintVar(&conf.HTTP.Port, "p", 1212, "Port")
+	defaultUsage := flag.Usage
+	flag.Usage = func() {
+		fmt.Printf("Aleksandr Shirobokov (@konrin), mail@konrin.ru, 2020\n")
+		defaultUsage()
+	}
+
+	flag.StringVar(&conf.DB.Connection, "c", ":memory:", "Connection string. Example: file:data.db?_auth&_auth_user=admin&_auth_pass=admin")
+	flag.StringVar(&conf.HTTP.Host, "h", "127.0.0.1", "Listen host")
+	flag.UintVar(&conf.HTTP.Port, "p", 1212, "Listen port")
 
 	flag.Parse()
 

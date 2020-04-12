@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -16,7 +15,8 @@ func main() {
 
 	db, err := NewDB(conf.DB.Connection)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("DB init error: %s\n", err.Error())
+		return
 	}
 	defer db.Close()
 
@@ -26,5 +26,7 @@ func main() {
 	http.HandleFunc("/sql/exec", rest.ExecHandler())
 	http.HandleFunc("/sql/query", rest.QueryHandler)
 
-	http.ListenAndServe(fmt.Sprintf("%s:%d", conf.HTTP.Host, conf.HTTP.Port), nil)
+	if err = http.ListenAndServe(fmt.Sprintf("%s:%d", conf.HTTP.Host, conf.HTTP.Port), nil); err != nil {
+		fmt.Printf("Server error: %s\n", err.Error())
+	}
 }
